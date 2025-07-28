@@ -58,7 +58,13 @@
         "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
         "BUILD_STANDALONE",
         "NEXT_PUBLIC_API_HITPAY_PRODUCTION",
-        "NEXT_PUBLIC_API_HITPAY_SANDBOX"
+        "NEXT_PUBLIC_API_HITPAY_SANDBOX",
+        "CHECKSUM_API_KEY",
+        "CAL_COM_BASE_URL",
+        "CAL_COM_LOGIN_URL",
+        "CHECKSUM_API_KEY",
+        "CAL_COM_BASE_URL",
+        "CAL_COM_LOGIN_URL"
       ]
     },
     "@calcom/web#dx": {
