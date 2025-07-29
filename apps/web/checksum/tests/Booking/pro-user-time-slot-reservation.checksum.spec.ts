@@ -91,8 +91,8 @@ test(
     });
 
     await expect(
-      variableStore.firstSlotAvailableText,
-      "The first available time slot should show 9:30 instead of 9:00 when reserved"
-    ).toContain("11:00");
+      variableStore.pageTwoInNewContext.locator('[data-testid="time"]').nth(0),
+      "The first available time slot should show 11:00 when reserved"
+    ).toHaveText(/11:00/);
   }
 );

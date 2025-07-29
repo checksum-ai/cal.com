@@ -47,7 +47,7 @@ export default defineConfig({
   webServer: [
     {
       command:
-        "NEXT_PUBLIC_IS_E2E=1 NODE_OPTIONS='--dns-result-order=ipv4first' yarn workspace @calcom/web dev -p 3000",
+        "NEXT_PUBLIC_IS_E2E=1 NODE_OPTIONS='--dns-result-order=ipv4first' yarn workspace @calcom/web start -p 3000",
       port: 3000,
       timeout: 60_000,
       reuseExistingServer: !process.env.CI,

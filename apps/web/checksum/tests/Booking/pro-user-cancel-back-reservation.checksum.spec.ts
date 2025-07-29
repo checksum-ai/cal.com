@@ -103,8 +103,8 @@ test(
     });
 
     await expect(
-      variableStore.firstSlotAvailableText,
-      "The first available time slot should show 9:00 when going back"
-    ).toContain("10:00");
+      variableStore.pageTwo.locator('[data-testid="time"]').nth(0),
+      "The first available time slot should show 10:00 when going back"
+    ).toHaveText(/10:00/);
   }
 );

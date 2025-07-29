@@ -25,9 +25,6 @@ test(
       page.goto("/settings/my-account/profile", { waitUntil: "load" })
     );
 
-    await expect(
-      page.getByTestId("profile-upload-avatar"),
-      "Expect the profile upload avatar to be visible"
-    ).toBeHidden();
+    await expect(page.locator("img"), "Expect the profile upload avatar to be visible").toBeHidden();
   }
 );

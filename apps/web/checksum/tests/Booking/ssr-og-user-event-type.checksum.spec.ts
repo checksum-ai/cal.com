@@ -90,9 +90,9 @@ test(
     });
 
     await expect(
-      variableStore.avatarLocators,
-      "There should be exactly one avatar link present"
-    ).toHaveLength(3);
+      page.locator('[data-testid="avatar-href"]'),
+      "There should be exactly three avatar links present"
+    ).toHaveCount(3);
 
     await checksumAI("Verify that the avatar link points to the correct user profile", async () => {
       for (const avatarLocator of variableStore.avatarLocators) {
