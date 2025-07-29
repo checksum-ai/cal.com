@@ -10,6 +10,13 @@ test(
     "Does not book seated round robin host outside availability with date override",
     "ROUND_ROBIN_001"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected host name from 'teammate-1' to 'colleague-1' to simulate a real app change where the team member name was updated.",
+    },
+  },
   async ({ page, users }) => {
     let testUser: any;
     let team: any;
@@ -95,7 +102,7 @@ test(
     await checksumAI("Verify that teammate-1 is booked instead of test-user", async () => {
       const host = page.locator('[data-testid="booking-host-name"]');
       const hostName = await host.innerText();
-      expect(hostName).toBe("teammate-1");
+      expect(hostName).toBe("colleague-1");
     });
 
     await checksumAI("Navigate back to the team booking page for a second booking", async () => {

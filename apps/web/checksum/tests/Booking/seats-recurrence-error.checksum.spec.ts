@@ -8,6 +8,13 @@ test(
     "Should throw error when both seatsPerTimeSlot and recurringEvent are set",
     "SEATS_RECURRENCE_001"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected error message text to a similar but different one to simulate a test expecting the wrong error message.",
+    },
+  },
   async ({ page, users }) => {
     let user: any;
 
@@ -66,8 +73,6 @@ test(
     await expect(
       page.locator("[data-testid=booking-fail]"),
       "The error message should contain the correct explanation about seats and recurrence conflict"
-    ).toContainText(
-      "Could not book the meeting. Recurring event doesn't support seats feature. Disable seats feature or make the event non-recurring."
-    );
+    ).toContainText("Seats feature is not compatible with recurring events");
   }
 );

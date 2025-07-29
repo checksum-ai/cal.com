@@ -5,6 +5,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Reschedule and cancel buttons should be hidden on success page", "DISABLED_CANCEL_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed locator from '[data-testid=\"reschedule-link\"]' to '[data-testid=\"reschedule-button\"]' to simulate a component refactor where the selector was updated.",
+    },
+  },
   async ({ page, users }) => {
     let user: any;
     let bookingId: string;
@@ -68,7 +75,7 @@ test(
     });
 
     await expect(
-      page.locator('[data-testid="reschedule-link"]'),
+      page.locator('[data-testid="reschedule-button"]'),
       "The reschedule link should be hidden for events with disabled rescheduling"
     ).toBeHidden();
 

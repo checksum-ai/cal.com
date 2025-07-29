@@ -59,6 +59,13 @@ test.skip(
 
 test(
   defineChecksumTest("Global GTM should be loaded on non-booking pages", "GTM_NON_BOOKING_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed assertion to expect 'facebookpixel' instead of 'googletagmanager' to simulate a test expecting the wrong script content.",
+    },
+  },
   async ({ page, users, variableStore }) => {
     test.skip(!process.env.NEXT_PUBLIC_BODY_SCRIPTS, "Skipping test as NEXT_PUBLIC_BODY_SCRIPTS is not set");
 
@@ -94,7 +101,7 @@ test(
     });
 
     await expect(variableStore.scriptContent, "The script content should contain googletagmanager").toContain(
-      "googletagmanager"
+      "facebookpixel"
     );
   }
 );

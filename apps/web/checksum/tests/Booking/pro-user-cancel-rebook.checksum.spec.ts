@@ -6,6 +6,13 @@ test(
     "Can cancel recently created booking and rebook the same timeslot",
     "PRO_CANCEL_REBOOK_001"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed locator from '[data-testid=\"attendee-email-test@example.com\"]' to '[data-testid=\"attendee-email-test@example.com-broken\"]' to simulate a component refactor where the selector was updated.",
+    },
+  },
   async ({ page, users }, testInfo) => {
     // Because it tests the entire booking flow + the cancellation + rebooking
     test.setTimeout(testInfo.timeout * 3);
@@ -58,7 +65,7 @@ test(
     ).toBeVisible();
 
     await expect(
-      page.locator(`[data-testid="attendee-email-test@example.com"]`),
+      page.locator(`[data-testid="attendee-email-test@example.com-broken"]`),
       "The attendee email should be displayed on the success page"
     ).toHaveText("test@example.com");
 

@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Skip confirm step if all fields are prefilled from query params", "PREFILL_SKIP_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed locator from '[data-testid=\"skip-confirm-book-button\"]' to '[data-testid=\"skip-confirm-button\"]' to simulate a component refactor where the selector was updated.",
+    },
+  },
   async ({ page }) => {
     await checksumAI("Navigate to the booking page", async () => {
       await page.goto("/pro/30min");
@@ -31,12 +38,12 @@ test(
     });
 
     await expect(
-      page.locator('[data-testid="skip-confirm-book-button"]'),
+      page.locator('[data-testid="skip-confirm-button"]'),
       "The skip confirm button should be visible when all fields are prefilled"
     ).toBeVisible();
 
     await checksumAI("Click the skip confirm button to bypass the confirmation step", async () => {
-      await page.click('[data-testid="skip-confirm-book-button"]');
+      await page.click('[data-testid="skip-confirm-button"]');
     });
 
     await expect(

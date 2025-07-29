@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Profile page is loaded for users in Organization", "VFrFP"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed assertion from toBeVisible() to toBeHidden() for the profile upload avatar to simulate a test expecting the wrong UI state.",
+    },
+  },
   async ({ page, users, variableStore }) => {
     const teamMatesObj = [{ name: "teammate-1" }, { name: "teammate-2" }];
     const owner = await users.create(undefined, {
@@ -21,6 +28,6 @@ test(
     await expect(
       page.getByTestId("profile-upload-avatar"),
       "Expect the profile upload avatar to be visible"
-    ).toBeVisible();
+    ).toBeHidden();
   }
 );

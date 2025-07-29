@@ -6,6 +6,13 @@ test(
     "Time slots are not reserved when going back via Cancel button on Event Form",
     "PRO_CANCEL_BACK_001"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected time slot text from '9:00' to '10:00' to simulate a test expecting the wrong time slot.",
+    },
+  },
   async ({ context, page, users, variableStore }) => {
     await checksumAI("Create a pro user for testing cancel back reservation", async () => {
       variableStore.pro = await users.create();
@@ -98,6 +105,6 @@ test(
     await expect(
       variableStore.firstSlotAvailableText,
       "The first available time slot should show 9:00 when going back"
-    ).toContain("9:00");
+    ).toContain("10:00");
   }
 );

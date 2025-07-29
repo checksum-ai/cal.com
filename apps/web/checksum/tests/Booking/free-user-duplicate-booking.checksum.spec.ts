@@ -5,6 +5,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test.skip(
   defineChecksumTest("Free user cannot book same slot multiple times", "FREE_DUP_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed locator from '[data-testid=\"booking-fail\"]' to '[data-testid=\"booking-error\"]' to simulate a component refactor where the selector was updated.",
+    },
+  },
   async ({ page, users, emails }) => {
     let freeUser: any;
     let user: any;
@@ -75,7 +82,7 @@ test.skip(
     });
 
     await expect(
-      page.locator('[data-testid="booking-fail"]'),
+      page.locator('[data-testid="booking-error"]'),
       "The booking should fail when attempting to book the same slot again"
     ).toBeVisible();
   }

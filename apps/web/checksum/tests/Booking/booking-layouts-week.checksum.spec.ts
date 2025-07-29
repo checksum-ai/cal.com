@@ -3,51 +3,61 @@ import { randomString } from "@calcom/lib/random";
 
 import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
-test(defineChecksumTest("Book on week layout", "LAYOUT_WEEK_001"), async ({ page, users }) => {
-  let user: any;
+test(
+  defineChecksumTest("Book on week layout", "LAYOUT_WEEK_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed selector from '[data-testid=\"toggle-group-item-week_view\"]' to '[data-testid=\"toggle-group-item-week-view\"]' to simulate a component refactor where the selector was updated.",
+    },
+  },
+  async ({ page, users }) => {
+    let user: any;
 
-  await checksumAI("Create a user for testing week layout booking", async () => {
-    user = await users.create();
-  });
+    await checksumAI("Create a user for testing week layout booking", async () => {
+      user = await users.create();
+    });
 
-  await checksumAI("Navigate to the user's booking page", async () => {
-    await page.goto(`/${user.username}`);
-  });
+    await checksumAI("Navigate to the user's booking page", async () => {
+      await page.goto(`/${user.username}`);
+    });
 
-  await checksumAI("Click on the first event type to start booking", async () => {
-    await page.click('[data-testid="event-type-lin"]');
-  });
+    await checksumAI("Click on the first event type to start booking", async () => {
+      await page.click('[data-testid="event-type-link"]');
+    });
 
-  await checksumAI("Switch to week view layout", async () => {
-    await page.click('[data-testid="toggle-group-item-week_view"]');
-  });
+    await checksumAI("Switch to week view layout", async () => {
+      await page.click('[data-testid="toggle-group-item-week-view"]');
+    });
 
-  await checksumAI("Navigate to next month to find available time slots", async () => {
-    await page.click('[data-testid="incrementMonth"]');
-  });
+    await checksumAI("Navigate to next month to find available time slots", async () => {
+      await page.click('[data-testid="incrementMonth"]');
+    });
 
-  await checksumAI("Click on an empty calendar cell in week view", async () => {
-    await page.locator('[data-testid="calendar-empty-cell"]').nth(0).click();
-  });
+    await checksumAI("Click on an empty calendar cell in week view", async () => {
+      await page.locator('[data-testid="calendar-empty-cell"]').nth(0).click();
+    });
 
-  await checksumAI("Fill in the attendee name", async () => {
-    await page.locator('[name="name"]').fill("Test name");
-  });
+    await checksumAI("Fill in the attendee name", async () => {
+      await page.locator('[name="name"]').fill("Test name");
+    });
 
-  await checksumAI("Fill in the attendee email address", async () => {
-    await page.locator('[name="email"]').fill(`${randomString(4)}@example.com`);
-  });
+    await checksumAI("Fill in the attendee email address", async () => {
+      await page.locator('[name="email"]').fill(`${randomString(4)}@example.com`);
+    });
 
-  await checksumAI("Add notes for the meeting", async () => {
-    await page.locator('[name="notes"]').fill("Test notes");
-  });
+    await checksumAI("Add notes for the meeting", async () => {
+      await page.locator('[name="notes"]').fill("Test notes");
+    });
 
-  await checksumAI("Confirm the booking by clicking the confirm button", async () => {
-    await page.click('[data-testid="confirm-book-button"]');
-  });
+    await checksumAI("Confirm the booking by clicking the confirm button", async () => {
+      await page.click('[data-testid="confirm-book-button"]');
+    });
 
-  await expect(
-    page.locator("[data-testid=success-page]"),
-    "The booking success page should be visible after confirming the booking in week layout"
-  ).toBeVisible();
-});
+    await expect(
+      page.locator("[data-testid=success-page]"),
+      "The booking success page should be visible after confirming the booking in week layout"
+    ).toBeVisible();
+  }
+);

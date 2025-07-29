@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test.skip(
   defineChecksumTest("Pro user can reschedule a booking", "PRO_RESCHEDULE_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed URL assertion to expect '/bookings' instead of '/booking' to simulate a real app change where the redirect URL was updated.",
+    },
+  },
   async ({ page, users, bookings }) => {
     await checksumAI("Create a pro user for testing rescheduling functionality", async () => {
       const pro = await users.create();
@@ -62,7 +69,7 @@ test.skip(
       page,
       "The page should redirect to the booking page after successful rescheduling"
     ).toHaveURL((url) => {
-      return url.pathname.startsWith("/booking");
+      return url.pathname.startsWith("/bookings");
     });
   }
 );

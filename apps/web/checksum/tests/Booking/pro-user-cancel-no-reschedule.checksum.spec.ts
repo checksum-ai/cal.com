@@ -6,6 +6,13 @@ test(
     "Can cancel recently created booking and shouldn't be allowed to reschedule it",
     "PRO_CANCEL_NO_RESCHEDULE_001"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed locator from '[data-testid=\"attendee-name-Test User\"]' to '[data-testid=\"attendee-name-Test User-broken\"]' to simulate a component refactor where the selector was updated.",
+    },
+  },
   async ({ page, users }, testInfo) => {
     // Because it tests the entire booking flow + the cancellation + rebooking
     test.setTimeout(testInfo.timeout * 3);
@@ -63,7 +70,7 @@ test(
     ).toHaveText("test@example.com");
 
     await expect(
-      page.locator(`[data-testid="attendee-name-Test User"]`),
+      page.locator(`[data-testid="attendee-name-Test User-broken"]`),
       "The attendee name should be displayed on the success page"
     ).toHaveText("Test User");
 

@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test.skip(
   defineChecksumTest("Can book an unconfirmed event multiple times", "PRO_UNCONFIRMED_MULTIPLE_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        'Changed locator from \'[data-testid="event-type-link"]:has-text("Opt in")\' to \'[data-testid="event-type-link-broken"]:has-text("Opt in")\' to simulate a component refactor where the selector was updated.',
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a pro user for testing unconfirmed event booking", async () => {
       variableStore.pro = await users.create();
@@ -13,7 +20,7 @@ test.skip(
     });
 
     await checksumAI("Click on the opt-in event type that requires confirmation", async () => {
-      await page.locator('[data-testid="event-type-link"]:has-text("Opt in")').click();
+      await page.locator('[data-testid="event-type-link-broken"]:has-text("Opt in")').click();
     });
 
     await checksumAI("Navigate to next month to find available time slots", async () => {

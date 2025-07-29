@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Prefill from session when logged in", "PREFILL_SESSION_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected name value to 'John Smith' instead of the actual user name to simulate a test expecting the wrong prefilled value.",
+    },
+  },
   async ({ page, users }) => {
     let prefill: any;
 
@@ -33,7 +40,7 @@ test(
     await expect(
       page.locator('[name="name"]'),
       "The name field should be prefilled with the user's name from session"
-    ).toHaveValue(prefill.name || "");
+    ).toHaveValue("John Smith");
 
     await expect(
       page.locator('[name="email"]'),

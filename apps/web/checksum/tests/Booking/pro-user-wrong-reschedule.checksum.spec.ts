@@ -6,6 +6,13 @@ test(
     "Reschedule redirects when rescheduleUid does not match current event type",
     "PRO_RESCHEDULE_002"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed URL assertion to expect '/events' instead of the correct event type slug to simulate a real app change where the redirect URL was updated.",
+    },
+  },
   async ({ page, users, bookings }) => {
     let pro: any;
     let eventType: any;
@@ -28,6 +35,6 @@ test(
     await expect(
       page,
       "The page should redirect to the correct event type when rescheduleUid doesn't match"
-    ).toHaveURL(new RegExp(`${pro.username}/${eventType.slug}`));
+    ).toHaveURL(new RegExp(`${pro.username}/events`));
   }
 );

@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Time slots should be reserved when selected", "PRO_RESERVATION_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected time slot text from '9:30' to '11:00' to simulate a test expecting the wrong time slot.",
+    },
+  },
   async ({ context, page, browser, users, variableStore }) => {
     await checksumAI("Create a pro user for testing time slot reservation", async () => {
       variableStore.pro = await users.create();
@@ -86,6 +93,6 @@ test(
     await expect(
       variableStore.firstSlotAvailableText,
       "The first available time slot should show 9:30 instead of 9:00 when reserved"
-    ).toContain("9:30");
+    ).toContain("11:00");
   }
 );

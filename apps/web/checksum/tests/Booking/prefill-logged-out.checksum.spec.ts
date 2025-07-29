@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Prefill from query params when logged out", "PREFILL_LOGGED_OUT_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected email value from 'test@example.com' to 'john@example.com' to simulate a test expecting the wrong prefilled value.",
+    },
+  },
   async ({ page, users }) => {
     await checksumAI("Navigate to the booking page", async () => {
       await page.goto("/pro/30min");
@@ -35,6 +42,6 @@ test(
     await expect(
       page.locator('[name="email"]'),
       "The email field should be prefilled with the query parameter value"
-    ).toHaveValue("test@example.com");
+    ).toHaveValue("john@example.com");
   }
 );

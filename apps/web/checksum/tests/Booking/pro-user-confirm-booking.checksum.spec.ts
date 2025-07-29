@@ -6,6 +6,13 @@ test.skip(
     "Can book an event that requires confirmation and then accept by organizer",
     "PRO_CONFIRM_001"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        'Changed locator from \'[data-testid="event-type-link"]:has-text("Opt in")\' to \'[data-testid="event-type-link-broken"]:has-text("Opt in")\' to simulate a component refactor where the selector was updated.',
+    },
+  },
   async ({ page, users }) => {
     let pro: any;
 
@@ -18,7 +25,7 @@ test.skip(
     });
 
     await checksumAI("Click on the opt-in event type that requires confirmation", async () => {
-      await page.locator('[data-testid="event-type-link"]:has-text("Opt in")').click();
+      await page.locator('[data-testid="event-type-link-broken"]:has-text("Opt in")').click();
     });
 
     await checksumAI("Navigate to next month to find available time slots", async () => {

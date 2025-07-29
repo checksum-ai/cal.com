@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("User page with special characters in username should not 404", "SPECIAL_CHAR_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed status assertion to expect 404 instead of not 404 to simulate a test expecting the wrong HTTP status.",
+    },
+  },
   async ({ page, users }) => {
     await checksumAI("Create a user with special characters in username", async () => {
       const user = await users.create({ username: "franz-janßen" });
@@ -11,7 +18,7 @@ test(
     await checksumAI("Navigate to the user page and verify it doesn't return 404", async () => {
       const user = await users.create({ username: "franz-janßen" });
       const response = await page.goto(`/${user.username}`);
-      expect(response?.status()).not.toBe(404);
+      expect(response?.status()).toBe(404);
     });
   }
 );

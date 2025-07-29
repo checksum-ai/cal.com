@@ -6,6 +6,13 @@ test(
     "Persist the field values when going back and coming back to the booking form",
     "PREFILL_PERSIST_001"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed assertion for the name field to expect the wrong value ('Jane Doe' instead of 'John Doe') to simulate a test expecting the wrong persisted value.",
+    },
+  },
   async ({ page, users }) => {
     await checksumAI("Navigate to the booking page", async () => {
       await page.goto("/pro/30min");
@@ -54,7 +61,7 @@ test(
     await expect(
       page.locator('[name="name"]'),
       "The name field should retain the previously entered value"
-    ).toHaveValue("John Doe");
+    ).toHaveValue("Jane Doe");
 
     await expect(
       page.locator('[name="email"]'),

@@ -7,6 +7,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("SSR and OG - User Event Type", "SSR_OG_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected avatar count from 1 to 3 to simulate a test expecting the wrong number of avatar elements.",
+    },
+  },
   async ({ page, users, variableStore }) => {
     let user: any;
 
@@ -85,7 +92,7 @@ test(
     await expect(
       variableStore.avatarLocators,
       "There should be exactly one avatar link present"
-    ).toHaveLength(1);
+    ).toHaveLength(3);
 
     await checksumAI("Verify that the avatar link points to the correct user profile", async () => {
       for (const avatarLocator of variableStore.avatarLocators) {

@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Pro user can book an event first day in next month", "PRO_BOOK_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed locator from '[data-testid=\"confirm-book-button\"]' to '[data-testid=\"confirm-button\"]' to simulate a component refactor where the selector was updated.",
+    },
+  },
   async ({ page, users }) => {
     await checksumAI("Create pro user and navigate to their page", async () => {
       const pro = await users.create();
@@ -38,7 +45,7 @@ test(
     });
 
     await checksumAI("Confirm the booking by clicking the confirm button", async () => {
-      await page.click('[data-testid="confirm-book-button"]');
+      await page.click('[data-testid="confirm-button"]');
     });
 
     await expect(

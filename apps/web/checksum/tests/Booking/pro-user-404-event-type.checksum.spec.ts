@@ -5,6 +5,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test.skip(
   defineChecksumTest("Returns 404 when requested event type does not exist", "PRO_404_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected status code from 404 to 200 to simulate a test expecting the wrong HTTP response.",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a pro user for testing 404 functionality", async () => {
       variableStore.pro = await users.create();
@@ -17,7 +24,7 @@ test.skip(
 
     await expect(
       variableStore.response,
-      "The response should return a 404 status when accessing a non-existent event type"
-    ).toHaveProperty("status", 404);
+      "The response should return a 200 status when accessing a non-existent event type"
+    ).toHaveProperty("status", 200);
   }
 );

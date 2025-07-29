@@ -3,6 +3,13 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Pro user's page has at least 2 visible events", "PRO_EVENTS_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed expected count from 2 to 5 to simulate a test expecting the wrong number of visible events.",
+    },
+  },
   async ({ page, users }) => {
     let pro: any;
 
@@ -18,7 +25,7 @@ test(
     await expect
       .poll(async () => {
         const count = await $eventTypes.count();
-        return count >= 2;
+        return count >= 5;
       }, "The pro user should have at least 2 visible event types on their page")
       .toBeTruthy();
   }
