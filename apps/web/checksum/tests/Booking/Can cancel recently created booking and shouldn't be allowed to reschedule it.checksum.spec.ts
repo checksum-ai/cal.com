@@ -9,8 +9,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed locator from '[data-testid=\"attendee-name-Test User\"]' to '[data-testid=\"attendee-name-Test User-broken\"]' to simulate a component refactor where the selector was updated.",
+      description: {
+        change:
+          "Changed locator from '[data-testid=\"attendee-name-Test User\"]' to '[data-testid=\"attendee-name-Test User-broken\"]' to simulate a component refactor where the selector was updated.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users }, testInfo) => {

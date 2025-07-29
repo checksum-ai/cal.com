@@ -11,8 +11,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed expected error message text to a similar but different one to simulate a test expecting the wrong error message.",
+      description: {
+        change:
+          "Changed expected error message text to a similar but different one to simulate a test expecting the wrong error message.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users }) => {

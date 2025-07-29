@@ -6,8 +6,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed assertion from toBeVisible() to toBeHidden() for the profile upload avatar to simulate a test expecting the wrong UI state.",
+      description: {
+        change:
+          "Changed assertion from toBeVisible() to toBeHidden() for the profile upload avatar to simulate a test expecting the wrong UI state.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users, variableStore }) => {

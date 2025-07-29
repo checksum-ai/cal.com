@@ -6,8 +6,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed expected time slot text from '9:30' to '11:00' to simulate a test expecting the wrong time slot.",
+      description: {
+        change:
+          "Changed expected time slot text from '9:30' to '11:00' to simulate a test expecting the wrong time slot.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ context, page, browser, users, variableStore }) => {

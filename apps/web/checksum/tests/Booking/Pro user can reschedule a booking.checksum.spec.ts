@@ -6,8 +6,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Removed waitForSelector for '[data-testid=\"bookings\"]' to simulate a timing issue where the test does not wait for the bookings list to load.",
+      description: {
+        change:
+          "Removed waitForSelector for '[data-testid=\"bookings\"]' to simulate a timing issue where the test does not wait for the bookings list to load.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users, bookings }) => {

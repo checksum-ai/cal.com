@@ -6,8 +6,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed expected count from 2 to 5 to simulate a test expecting the wrong number of visible events.",
+      description: {
+        change:
+          "Changed expected count from 2 to 5 to simulate a test expecting the wrong number of visible events.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users }) => {

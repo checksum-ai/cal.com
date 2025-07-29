@@ -8,8 +8,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed selector from '[data-testid=\"toggle-group-item-column_vie\"]' to '[data-testid=\"toggle-group-item-column-view\"]' to simulate a component refactor where the selector was updated.",
+      description: {
+        change:
+          "Changed selector from '[data-testid=\"toggle-group-item-column_vie\"]' to '[data-testid=\"toggle-group-item-column-view\"]' to simulate a component refactor where the selector was updated.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users }) => {

@@ -9,8 +9,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed URL assertion to expect '/events' instead of the correct event type slug to simulate a real app change where the redirect URL was updated.",
+      description: {
+        change:
+          "Changed URL assertion to expect '/events' instead of the correct event type slug to simulate a real app change where the redirect URL was updated.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users, bookings }) => {

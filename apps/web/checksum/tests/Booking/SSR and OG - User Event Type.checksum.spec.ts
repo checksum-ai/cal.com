@@ -10,8 +10,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed expected avatar count from 1 to 3 to simulate a test expecting the wrong number of avatar elements.",
+      description: {
+        change:
+          "Changed expected avatar count from 1 to 3 to simulate a test expecting the wrong number of avatar elements.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users, variableStore }) => {

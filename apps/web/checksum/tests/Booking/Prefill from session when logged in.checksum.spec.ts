@@ -2,15 +2,28 @@
 import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
-  defineChecksumTest("Prefill from query params when logged out", "PREFILL_LOGGED_OUT_001"),
+  defineChecksumTest("Prefill from session when logged in", "PREFILL_SESSION_001"),
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed expected email value from 'test@example.com' to 'john@example.com' to simulate a test expecting the wrong prefilled value.",
+      description: {
+        change:
+          "Changed expected name value to 'John Smith' instead of the actual user name to simulate a test expecting the wrong prefilled value.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users }) => {
+    let prefill: any;
+
+    await checksumAI("Create a user for testing prefill functionality", async () => {
+      prefill = await users.create({ name: "Prefill User" });
+    });
+
+    await checksumAI("Login as the user to access session data", async () => {
+      await prefill.apiLogin();
+    });
+
     await checksumAI("Navigate to the booking page", async () => {
       await page.goto("/pro/30min");
     });
@@ -27,21 +40,14 @@ test(
       await page.locator('[data-testid="time"]').nth(0).click();
     });
 
-    await checksumAI("Add query parameters to prefill the form fields", async () => {
-      const url = new URL(page.url());
-      url.searchParams.set("name", "Test Name");
-      url.searchParams.set("email", "test@example.com");
-      await page.goto(url.toString());
-    });
-
     await expect(
       page.locator('[name="name"]'),
-      "The name field should be prefilled with the query parameter value"
-    ).toHaveValue("Test Name");
+      "The name field should be prefilled with the user's name from session"
+    ).toHaveValue("John Smith");
 
     await expect(
       page.locator('[name="email"]'),
-      "The email field should be prefilled with the query parameter value"
-    ).toHaveValue("john@example.com");
+      "The email field should be prefilled with the user's email from session"
+    ).toHaveValue(prefill.email);
   }
 );

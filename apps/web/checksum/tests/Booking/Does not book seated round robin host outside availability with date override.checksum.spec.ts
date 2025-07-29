@@ -13,8 +13,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed expected host name from 'teammate-1' to 'colleague-1' to simulate a real app change where the team member name was updated.",
+      description: {
+        change:
+          "Changed expected host name from 'teammate-1' to 'colleague-1' to simulate a real app change where the team member name was updated.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users }) => {

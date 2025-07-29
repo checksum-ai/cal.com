@@ -2,54 +2,6 @@
 import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
-  defineChecksumTest("Prefill from session when logged in", "PREFILL_SESSION_001"),
-  {
-    annotation: {
-      type: "IntentionallyBroken",
-      description:
-        "Changed expected name value to 'John Smith' instead of the actual user name to simulate a test expecting the wrong prefilled value.",
-    },
-  },
-  async ({ page, users }) => {
-    let prefill: any;
-
-    await checksumAI("Create a user for testing prefill functionality", async () => {
-      prefill = await users.create({ name: "Prefill User" });
-    });
-
-    await checksumAI("Login as the user to access session data", async () => {
-      await prefill.apiLogin();
-    });
-
-    await checksumAI("Navigate to the booking page", async () => {
-      await page.goto("/pro/30min");
-    });
-
-    await checksumAI("Navigate to next month to find available time slots", async () => {
-      await page.click('[data-testid="incrementMonth"]');
-    });
-
-    await checksumAI("Select the first available day in the calendar", async () => {
-      await page.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
-    });
-
-    await checksumAI("Select the first available time slot", async () => {
-      await page.locator('[data-testid="time"]').nth(0).click();
-    });
-
-    await expect(
-      page.locator('[name="name"]'),
-      "The name field should be prefilled with the user's name from session"
-    ).toHaveValue("John Smith");
-
-    await expect(
-      page.locator('[name="email"]'),
-      "The email field should be prefilled with the user's email from session"
-    ).toHaveValue(prefill.email);
-  }
-);
-
-test(
   defineChecksumTest("Prefill from query params when logged in", "PREFILL_QUERY_001"),
   async ({ page, users }) => {
     let prefill: any;

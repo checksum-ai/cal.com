@@ -9,8 +9,11 @@ test(
   {
     annotation: {
       type: "IntentionallyBroken",
-      description:
-        "Changed assertion for the name field to expect the wrong value ('Jane Doe' instead of 'John Doe') to simulate a test expecting the wrong persisted value.",
+      description: {
+        change:
+          "Changed assertion for the name field to expect the wrong value ('Jane Doe' instead of 'John Doe') to simulate a test expecting the wrong persisted value.",
+        shouldAutoRecover: true,
+      },
     },
   },
   async ({ page, users }) => {
