@@ -11,7 +11,7 @@ test(
       type: "IntentionallyBroken",
       description: {
         change:
-          "Changed locator from '[data-testid=\"attendee-name-Test User\"]' to '[data-testid=\"attendee-name-Test User-broken\"]' to simulate a component refactor where the selector was updated.",
+          "Changed locator from '[data-testid=\"attendee-name-Test User\"]' to '[data-testid=\"attendee-Test User\"]' to simulate a component refactor where the selector was updated.",
         shouldAutoRecover: true,
       },
     },
@@ -73,7 +73,7 @@ test(
     ).toHaveText("test@example.com");
 
     await expect(
-      page.locator(`[data-testid="attendee-name-Test User-broken"]`),
+      page.locator(`[data-testid="attendee-Test User"]`),
       "The attendee name should be displayed on the success page"
     ).toHaveText("Test User");
 

@@ -6,6 +6,15 @@ test(
     "Event type page with special characters in username should not 404",
     "SPECIAL_CHAR_002"
   ),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Added really short timeout to waiting for response",
+        shouldAutoRecover: true,
+      },
+    },
+  },
   async ({ page, users }) => {
     await checksumAI("Create a user with special characters in username", async () => {
       const user = await users.create({ username: "franz-janßen" });
@@ -13,7 +22,7 @@ test(
 
     await checksumAI("Navigate to the event type page and verify it doesn't return 404", async () => {
       const user = await users.create({ username: "franz-janßen" });
-      const response = await page.goto(`/${user.username}/30-min`);
+      const response = await page.goto(`/${user.username}/30-min`, { timeout: 1 });
       expect(response?.status()).not.toBe(404);
     });
   }

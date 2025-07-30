@@ -3,6 +3,16 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Prefill from query params when logged in", "PREFILL_QUERY_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Removed email from query params",
+        shouldAutoRecover: false,
+        shouldPass: false,
+      },
+    },
+  },
   async ({ page, users }) => {
     let prefill: any;
 
@@ -21,7 +31,6 @@ test(
     await checksumAI("Add query parameters to override session data", async () => {
       const url = new URL(page.url());
       url.searchParams.set("name", "Test Name");
-      url.searchParams.set("email", "test@example.com");
       await page.goto(url.toString());
     });
 

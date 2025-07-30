@@ -12,7 +12,8 @@ test(
       description: {
         change:
           "Changed expected time slot text from '9:00' to '10:00' to simulate a test expecting the wrong time slot.",
-        shouldAutoRecover: true,
+        shouldAutoRecover: false,
+        shouldPass: false,
       },
     },
   },

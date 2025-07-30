@@ -31,7 +31,7 @@ test(
     });
 
     await checksumAI("Navigate to the upcoming bookings page", async () => {
-      await page.goto("/bookings/upcoming");
+      await page.goto("/bookings/upcoming", { waitUntil: "commit" });
     });
 
     await checksumAI("Open the actions dropdown for the first booking", async () => {

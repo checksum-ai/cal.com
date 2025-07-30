@@ -13,15 +13,15 @@ test(
       },
     },
   },
-  async ({ page, users }) => {
+  async ({ page, users, variableStore }) => {
     await checksumAI("Create a user with special characters in username", async () => {
-      const user = await users.create({ username: "franz-janßen" });
+      variableStore.user = await users.create({ username: "franz-janßen" });
     });
 
     await checksumAI("Navigate to the user page and verify it doesn't return 404", async () => {
-      const user = await users.create({ username: "franz-janßen" });
-      const response = await page.goto(`/${user.username}`);
-      expect(response?.status()).toBe(404);
+      variableStore.response = await page.goto(`/${user.username}`);
     });
+
+    expect(variableStore.response?.status()).not.toBe("404");
   }
 );

@@ -10,7 +10,7 @@ test(
       type: "IntentionallyBroken",
       description: {
         change:
-          "Changed selector from '[data-testid=\"toggle-group-item-column_vie\"]' to '[data-testid=\"toggle-group-item-column-view\"]' to simulate a component refactor where the selector was updated.",
+          "Changed selector from '[data-testid=\"toggle-group-item-column_view\"]' to '[data-testid=\"toggle-group-item-column-view\"]' to simulate a component refactor where the selector was updated.",
         shouldAutoRecover: true,
       },
     },
@@ -31,7 +31,7 @@ test(
     });
 
     await checksumAI("Switch to column view layout", async () => {
-      await page.click('[data-testid="toggle-group-item-column-view"]');
+      await page.click('[data-testid="toggle-group-item-column_view"]');
     });
 
     await checksumAI("Navigate to next month to find available time slots", async () => {

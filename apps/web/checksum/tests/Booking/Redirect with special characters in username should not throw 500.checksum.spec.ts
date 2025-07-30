@@ -3,9 +3,18 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Redirect with special characters in username should not throw 500", "SPECIAL_CHAR_003"),
-  async ({ page, users }) => {
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Did not change anything - it should normally pass",
+        shouldAutoRecover: false,
+      },
+    },
+  },
+  async ({ page, users, variableStore }) => {
     await checksumAI("Create a user with special characters and single event type", async () => {
-      const benny = await users.create({
+      variableStore.benny = await users.create({
         username: "ßenny", // ß is a special character
         eventTypes: [
           {
@@ -18,21 +27,11 @@ test(
       });
     });
 
-    await checksumAI("Navigate to user page and verify redirect works without 500 error", async () => {
-      const benny = await users.create({
-        username: "ßenny", // ß is a special character
-        eventTypes: [
-          {
-            title: "15 min",
-            slug: "15-min",
-            length: 15,
-          },
-        ],
-        overrideDefaultEventTypes: true,
-      });
+    await checksumAI("Navigate to user page", async () => {
       // This redirects to /[user]/[type] because this user has only 1 event-type
-      const response = await page.goto(`/${benny.username}`);
-      expect(response?.status()).not.toBe(500);
+      variableStore.response = await page.goto(`/${variableStore.benny.username}`);
     });
+
+    await expect(variableStore.response?.status(), "Redirect should work without 500 error").not.toBe(500);
   }
 );
