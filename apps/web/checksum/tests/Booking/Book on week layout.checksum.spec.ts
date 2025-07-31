@@ -10,7 +10,7 @@ test(
       type: "IntentionallyBroken",
       description: {
         change:
-          "Changed selector from '[data-testid=\"toggle-group-item-week_view\"]' to '[data-testid=\"toggle-group-item-week-view\"]' to simulate a component refactor where the selector was updated.",
+          "Changed selector from '[data-testid=\"toggle-group-item-week_view\"]' (WORKING) to '[data-testid=\"toggle-group-item-week-view\"]' (BROKEN) to simulate a component refactor where the selector was updated but test was not.",
         shouldAutoRecover: true,
       },
     },

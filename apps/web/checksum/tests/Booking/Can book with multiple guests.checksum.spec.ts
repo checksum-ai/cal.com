@@ -8,7 +8,7 @@ test(
       type: "IntentionallyBroken",
       description: {
         change:
-          "Changed locator from '[data-testid=\"add-guests\"]' to '[data-testid=\"add-guests-button\"]' to simulate a component refactor where the selector was updated.",
+          "Changed locator from '[data-testid=\"add-guests\"]' (WORKING) to '[data-testid=\"add-guests-button\"]' (BROKEN) to simulate a component refactor where the selector was updated but test was not.",
         shouldAutoRecover: true,
       },
     },

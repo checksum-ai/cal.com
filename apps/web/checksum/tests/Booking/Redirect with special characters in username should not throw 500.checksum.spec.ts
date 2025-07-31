@@ -8,7 +8,7 @@ test(
       type: "IntentionallyBroken",
       description: {
         change: "Did not change anything - it should normally pass",
-        shouldAutoRecover: false,
+        shouldAutoRecover: true,
       },
     },
   },
