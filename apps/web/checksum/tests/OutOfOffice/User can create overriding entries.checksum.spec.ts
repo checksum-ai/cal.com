@@ -11,7 +11,6 @@ test(
       type: "IntentionallyBroken",
       description: {
         change: "End date was not selected correctly",
-        shouldAutoRecover: true,
         shouldPass: true,
       },
     },

@@ -10,7 +10,7 @@ test(
         change:
           "Changed expected name value to 'John Smith' instead of the actual user name to simulate a test expecting the wrong prefilled value.",
         shouldAutoRecover: false,
-        shouldFail: true,
+        shouldPass: false,
       },
     },
   },

@@ -3,16 +3,6 @@ import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
 
 test(
   defineChecksumTest("Pro user can reschedule a booking", "PRO_RESCHEDULE_001"),
-  {
-    annotation: {
-      type: "IntentionallyBroken",
-      description: {
-        change:
-          "Removed waitForSelector for '[data-testid=\"bookings\"]' to simulate a timing issue where the test does not wait for the bookings list to load.",
-        shouldAutoRecover: true,
-      },
-    },
-  },
   async ({ page, users, bookings }) => {
     let pro: any;
     let eventType: any;
