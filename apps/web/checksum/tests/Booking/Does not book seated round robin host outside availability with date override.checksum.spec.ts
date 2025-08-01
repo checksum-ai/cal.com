@@ -3,35 +3,23 @@ import { randomString } from "@calcom/lib/random";
 import { SchedulingType } from "@calcom/prisma/client";
 import type { Schedule, TimeRange } from "@calcom/types/schedule";
 
-import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
+import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest(
     "Does not book seated round robin host outside availability with date override",
     "ROUND_ROBIN_001"
   ),
-  {
-    annotation: {
-      type: "IntentionallyBroken",
-      description: {
-        change:
-          "Changed expected host name from 'teammate-1' to 'colleague-1' to simulate a real app change where the team member name was updated.",
-        shouldAutoRecover: true,
-      },
-    },
-  },
+  {},
   async ({ page, users }) => {
     let testUser: any;
     let team: any;
-
     await checksumAI("Create a team with round robin scheduling and specific availability", async () => {
       const teamMatesObj = [{ name: "teammate-1" }];
-
       const dateRanges: TimeRange = {
         start: new Date(new Date().setUTCHours(10, 0, 0, 0)), //one hour after default schedule (teammate-1's schedule)
         end: new Date(new Date().setUTCHours(17, 0, 0, 0)),
       };
-
       const schedule: Schedule = [
         [],
         [dateRanges],
@@ -41,7 +29,6 @@ test(
         [dateRanges],
         [],
       ];
-
       testUser = await users.create(
         { schedule },
         {
@@ -53,98 +40,77 @@ test(
         }
       );
     });
-
     await checksumAI("Get the team membership for navigation", async () => {
       team = await testUser.getFirstTeamMembership();
     });
-
     await checksumAI("Navigate to the team booking page", async () => {
       await page.goto(`/team/${team.team.slug}`);
     });
-
     await checksumAI("Wait for the page to load completely", async () => {
       await page.waitForLoadState("domcontentloaded");
     });
-
     await checksumAI("Login as the test user to access team management", async () => {
       await testUser.apiLogin();
     });
-
     await checksumAI("Click on the first event type (round robin)", async () => {
       await page.click('[data-testid="event-type-link"]');
     });
-
     await checksumAI("Navigate to next month to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
     });
-
     await checksumAI(
       "Select the first available time slot (9AM where test-user is not available)",
       async () => {
         await page.locator('[data-testid="time"]').nth(0).click();
       }
     );
-
     await checksumAI("Fill in the attendee name", async () => {
       await page.locator('[name="name"]').fill("Test name");
     });
-
     await checksumAI("Fill in the attendee email address", async () => {
       await page.locator('[name="email"]').fill(`${randomString(4)}@example.com`);
     });
-
     await checksumAI("Confirm the booking by clicking the confirm button", async () => {
       await page.click('[data-testid="confirm-book-button"]');
     });
-
     await expect(
       page.locator("[data-testid=success-page]"),
       "The booking success page should be visible after confirming the booking"
     ).toBeVisible();
-
     await checksumAI("Verify that teammate-1 is booked instead of test-user", async () => {
       const host = page.locator('[data-testid="booking-host-name"]');
       const hostName = await host.innerText();
       expect(hostName).toBe("colleague-1");
     });
-
     await checksumAI("Navigate back to the team booking page for a second booking", async () => {
       await page.goto(`/team/${team.team.slug}`);
     });
-
     await checksumAI("Click on the first event type again for the second booking", async () => {
       await page.click('[data-testid="event-type-link"]');
     });
-
     await checksumAI("Navigate to the month after next to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
       await page.click('[data-testid="incrementMonth"]');
     });
-
     await checksumAI(
       "Select the first available time slot again (9AM where test-user is not available)",
       async () => {
         await page.locator('[data-testid="time"]').nth(0).click();
       }
     );
-
     await checksumAI("Fill in the attendee name for the second booking", async () => {
       await page.locator('[name="name"]').fill("Test name");
     });
-
     await checksumAI("Fill in the attendee email address for the second booking", async () => {
       await page.locator('[name="email"]').fill(`${randomString(4)}@example.com`);
     });
-
     await checksumAI("Confirm the second booking by clicking the confirm button", async () => {
       await page.click('[data-testid="confirm-book-button"]');
     });
-
     await expect(
       page.locator("[data-testid=success-page]"),
       "The booking success page should be visible after confirming the second booking"
     ).toBeVisible();
-
     await checksumAI("Verify that teammate-1 is booked again for the second booking", async () => {
       const hostSecondBooking = page.locator('[data-testid="booking-host-name"]');
       const hostNameSecondBooking = await hostSecondBooking.innerText();

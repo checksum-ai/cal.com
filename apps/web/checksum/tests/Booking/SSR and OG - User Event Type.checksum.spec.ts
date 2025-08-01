@@ -3,23 +3,13 @@ import { JSDOM } from "jsdom";
 
 import { WEBAPP_URL } from "@calcom/lib/constants";
 
-import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
+import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("SSR and OG - User Event Type", "SSR_OG_001"),
-  {
-    annotation: {
-      type: "IntentionallyBroken",
-      description: {
-        change:
-          "Changed expected avatar count from 1 to 3 to simulate a test expecting the wrong number of avatar elements.",
-        shouldAutoRecover: true,
-      },
-    },
-  },
+  {},
   async ({ page, users, variableStore }) => {
     let user: any;
-
     await checksumAI("Create a test user for SSR testing", async () => {
       const name = "Test User";
       user = await users.create({
@@ -27,7 +17,6 @@ test(
       });
       variableStore.name = name;
     });
-
     await checksumAI("Wait for the page response to load", async () => {
       const responsePromise = page.waitForResponse(
         (response) => response.url().includes(`/${user.username}/30-min`) && response.status() === 200
@@ -36,67 +25,53 @@ test(
       await page.content();
       variableStore.response = await responsePromise;
     });
-
     await checksumAI("Extract SSR content from the response", async () => {
       variableStore.ssrResponse = await variableStore.response.text();
       variableStore.document = new JSDOM(variableStore.ssrResponse).window.document;
     });
-
     await checksumAI("Extract title text from the document", async () => {
       variableStore.titleText = variableStore.document.querySelector("title")?.textContent;
     });
-
     await checksumAI("Extract OG image from the document", async () => {
       variableStore.ogImage = variableStore.document
         .querySelector('meta[property="og:image"]')
         ?.getAttribute("content");
     });
-
     await checksumAI("Extract OG URL from the document", async () => {
       variableStore.ogUrl = variableStore.document
         .querySelector('meta[property="og:url"]')
         ?.getAttribute("content");
     });
-
     await checksumAI("Extract canonical link from the document", async () => {
       variableStore.canonicalLink = variableStore.document
         .querySelector('link[rel="canonical"]')
         ?.getAttribute("href");
     });
-
     await expect(variableStore.titleText, "The title should contain the user's name").toContain(
       variableStore.name
     );
-
     await expect(variableStore.ogUrl, "The OG URL should match the expected format").toEqual(
       `${WEBAPP_URL}/${user.username}/30-min`
     );
-
     await expect(variableStore.canonicalLink, "The canonical link should match the expected format").toEqual(
       `${WEBAPP_URL}/${user.username}/30-min`
     );
-
     await expect(variableStore.ogImage, "The OG image should contain the expected image path").toContain(
       "/_next/image?w=1200&q=100&url=%2Fapi%2Fsocial%2Fog%2Fimage%3Ftype%3Dmeeting%26title%3D30%2Bmin"
     );
-
     await expect(variableStore.ogImage, "The OG image should contain the user's name").toContain(
       "meetingProfileName%3DTest%2BUser"
     );
-
     await checksumAI("Wait for avatar elements to be present on the page", async () => {
       await page.waitForSelector('[data-testid="avatar-href"]');
     });
-
     await checksumAI("Get all avatar link elements", async () => {
       variableStore.avatarLocators = await page.locator('[data-testid="avatar-href"]').all();
     });
-
     await expect(
       page.locator('[data-testid="avatar-href"]'),
       "There should be exactly three avatar links present"
     ).toHaveCount(3);
-
     await checksumAI("Verify that the avatar link points to the correct user profile", async () => {
       for (const avatarLocator of variableStore.avatarLocators) {
         const href = await avatarLocator.getAttribute("href");

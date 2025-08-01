@@ -14,6 +14,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 0 : 0,
   workers: process.env.CI ? 1 : os.cpus().length / 2,
+  globalSetup: require.resolve("./global-setup"),
   reporter: process.env.CI
     ? [["html", { open: "never", outputFolder: "test-results" }], ["line"]]
     : [

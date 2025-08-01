@@ -2,7 +2,7 @@
 import dayjs from "@calcom/dayjs";
 import prisma from "@calcom/prisma";
 
-import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
+import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("User can create Entry for past", "OOO_PAST_ENTRY_001"),
@@ -10,11 +10,9 @@ test(
     await checksumAI("Create a user", async () => {
       variableStore.user = await users.create({ name: "userOne" });
     });
-
     await checksumAI("Login as the created user", async () => {
       await variableStore.user.apiLogin();
     });
-
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -23,7 +21,6 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
-
     await checksumAI("Click the add entry button to open the out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -31,25 +28,20 @@ test(
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
-
     await checksumAI("Click on the date range picker to select dates", async () => {
       await page.locator('[data-testid="date-range"]').click();
     });
-
     await checksumAI("Select past dates for the out of office entry", async () => {
       await page.locator('button[name="day"]:text-is("1")').nth(0).click();
       await page.locator('button[name="day"]:text-is("3")').nth(0).click();
     });
-
     await checksumAI("Select a reason for the past entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
-
     await checksumAI("Save the past out of office entry", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
-
     await checksumAI("Verify the out of office entry was created with past dates", async () => {
       const ooo = await prisma.outOfOfficeEntry.findMany({
         where: {
@@ -64,11 +56,9 @@ test(
         },
         take: 1,
       });
-
       const entry = ooo[0];
       const entryFromDate = dayjs(entry.start);
       const entryToDate = dayjs(entry.end);
-
       expect(entryFromDate.format("DD")).toBe("01");
       expect(entryToDate.format("DD")).toBe("03");
     });

@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import dayjs from "@calcom/dayjs";
 import prisma from "@calcom/prisma";
 
-import { test, defineChecksumTest, checksumAI, expect } from "../../fixtures";
+import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Profile redirection", "OOO_PROFILE_REDIRECT_001"),
@@ -29,16 +29,13 @@ test(
         },
       });
     });
-
     await checksumAI("Navigate to the user's profile page", async () => {
       await page.goto(`/${variableStore.user.username}`);
     });
-
     await checksumAI("Click on the first event type link", async () => {
       const eventTypeLink = page.locator('[data-testid="event-type-link"]').first();
       await eventTypeLink.click();
     });
-
     await expect(
       page.getByTestId("away-emoji"),
       "The away emoji should be visible indicating the user is out of office"
