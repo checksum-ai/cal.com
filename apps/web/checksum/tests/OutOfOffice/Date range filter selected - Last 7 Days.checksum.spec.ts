@@ -3,14 +3,21 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Date range filter selected - Last 7 Days", "OOO_DATE_FILTER_7_DAYS_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Should use '[data-testid=\"date-filter\"]' for date filter as it is correct locator",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a user", async () => {
       variableStore.user = await users.create({ name: "userOne" });
     });
+
     await checksumAI("Login as the created user", async () => {
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -19,12 +26,15 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await checksumAI("Click on the date range filter dropdown", async () => {
-      await page.getByTestId("date-range-filter").click();
+      await page.getByTestId("date-filter").click();
     });
+
     await checksumAI("Select 'Last 7 Days' from the date range filter", async () => {
       await page.getByTestId("select-option-last-7-days").click();
     });
+
     await expect(
       page.locator('[data-testid="date-range-filter"]'),
       "The date range filter should show 'Last 7 Days' as selected"

@@ -5,7 +5,14 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Admin can create, edit and delete team member's OOO", "OOO_TEAM_ADMIN_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Should click correct cancel button",
+      },
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create team with admin and members", async () => {
       const teamMatesObj = [{ name: "member-1" }, { name: "member-2" }, { name: "member-3" }];
@@ -22,9 +29,11 @@ test(
       variableStore.member2User = users.get().find((user) => user.name === "member-2");
       variableStore.member3User = users.get().find((user) => user.name === "member-3");
     });
+
     await checksumAI("Login as team admin", async () => {
       await variableStore.teamAdmin.apiLogin();
     });
+
     await checksumAI("Navigate to the team out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -33,6 +42,7 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await checksumAI("Click the add entry button to open the team out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -45,36 +55,45 @@ test(
       await legacyListMembersRespPromise;
       await legacyListMembersRespPromise;
     });
+
     await checksumAI("Select member-1 for the out of office entry", async () => {
       await page.getByTestId(`ooofor_username_select_${variableStore.member1User?.id}`).click();
     });
+
     await checksumAI("Click on the date range picker to select dates", async () => {
       await page.locator('[data-testid="date-range"]').click();
     });
+
     await checksumAI("Select dates for member-1's out of office entry (1st-3rd)", async () => {
       await page.locator('button[name="next-month"]').click();
       await page.locator('button[name="day"]:text-is("1")').nth(0).click();
       await page.locator('button[name="day"]:text-is("3")').nth(0).click();
     });
+
     await checksumAI("Select a reason for member-1's entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Add notes for member-1's entry", async () => {
       await page.getByTestId("notes_input").click();
       await page.getByTestId("notes_input").fill("Demo notes");
     });
+
     await checksumAI("Enable redirect and select member-2 as redirect target", async () => {
       await page.getByTestId("profile-redirect-switch").click();
       await page.getByTestId(`team_username_select_${variableStore.member2User?.id}`).click();
     });
+
     await checksumAI("Save member-1's out of office entry with redirect to member-2", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.member2User?.username}"]`).nth(0),
       "Member-1's out of office entry should be visible with redirect to member-2"
     ).toBeVisible();
+
     await checksumAI("Click the add entry button to create another team entry", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -87,42 +106,53 @@ test(
       await legacyListMembersRespPromise;
       await legacyListMembersRespPromise;
     });
+
     await checksumAI("Select member-2 for the out of office entry", async () => {
       await page.getByTestId(`ooofor_username_select_${variableStore.member2User?.id}`).click();
     });
+
     await checksumAI("Click on the date range picker to select dates for member-2", async () => {
       await page.locator('[data-testid="date-range"]').click();
     });
+
     await checksumAI("Select dates for member-2's out of office entry (1st-3rd)", async () => {
       await page.locator('button[name="next-month"]').click();
       await page.locator('button[name="day"]:text-is("1")').nth(0).click();
       await page.locator('button[name="day"]:text-is("3")').nth(0).click();
     });
+
     await checksumAI("Select a reason for member-2's entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Add notes for member-2's entry", async () => {
       await page.getByTestId("notes_input").click();
       await page.getByTestId("notes_input").fill("Demo notes");
     });
+
     await checksumAI("Enable redirect and select member-1 as redirect target", async () => {
       await page.getByTestId("profile-redirect-switch").click();
       await page.getByTestId(`team_username_select_${variableStore.member1User?.id}`).click();
     });
+
     await checksumAI("Attempt to save member-2's out of office entry with reverse redirect", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator('text="booking_redirect_infinite_not_allowed"'),
       "An error message should appear indicating reverse redirect is not allowed"
     ).toBeTruthy();
+
     await checksumAI("Cancel the form to return to the team out of office page", async () => {
       await page.locator('text="cancel"').click();
     });
+
     await checksumAI("Click the edit button for member-2's out of office entry", async () => {
       await page.getByTestId(`ooo-edit-${variableStore.member2User?.username}`).click();
     });
+
     await checksumAI("Wait for the edit form to load", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -134,19 +164,24 @@ test(
       await legacyListMembersRespPromise;
       await legacyListMembersRespPromise;
     });
+
     await checksumAI("Update the redirect member to member-3", async () => {
       await page.getByTestId(`team_username_select_${variableStore.member3User?.id}`).click();
     });
+
     await checksumAI("Save the updated out of office entry", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.member3User?.username}"]`).nth(0),
       "The updated out of office entry should be visible with redirect to member-3"
     ).toBeVisible();
+
     await checksumAI("Click the delete button for member-3's out of office entry", async () => {
       await page.getByTestId(`ooo-delete-${variableStore.member3User?.username}`).click();
     });
+
     await expect(
       page.locator('text="success_deleted_entry_out_of_office"'),
       "A success message should appear indicating the entry was deleted"

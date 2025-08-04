@@ -6,17 +6,25 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("User can create consecutive reverse redirect OOOs", "OOO_REVERSE_REDIRECT_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Should click add_entry_ooo button",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create users and team for the reverse redirect test", async () => {
       variableStore.user = await users.create({ name: "userOne" });
       variableStore.userTo = await users.create({ name: "userTwo" });
       variableStore.userToSecond = await users.create({ name: "userThree" });
+
       variableStore.team = await prisma.team.create({
         data: {
           name: "test-insights",
           slug: `test-insights-${Date.now()}-${randomString(5)}}`,
         },
       });
+
       await prisma.membership.createMany({
         data: [
           {
@@ -39,8 +47,10 @@ test(
           },
         ],
       });
+
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -49,6 +59,7 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await checksumAI("Click the add entry button to open the out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -56,55 +67,69 @@ test(
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
+
     await checksumAI("Select a reason for the out of office entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Fill in the notes field with demo notes", async () => {
       await page.getByTestId("notes_input").click();
       await page.getByTestId("notes_input").fill("Demo notes");
     });
+
     await checksumAI("Enable the profile redirect switch", async () => {
       await page.getByTestId("profile-redirect-switch").click();
     });
+
     await checksumAI("Select userTwo to redirect bookings to", async () => {
       await page.getByTestId(`team_username_select_${variableStore.userTo.id}`).click();
     });
+
     await checksumAI("Save the first out of office entry with redirect to userTwo", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.userTo.username}"]`),
       "The first out of office entry should be visible with redirect to userTwo"
     ).toBeVisible();
+
     await checksumAI("Click the add entry button to create a second out of office entry", async () => {
       const reasonListRespPromise = page.waitForResponse(
-        (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
+        (response) => response.url().includes("outOfOffice?batch=1") && response.status() === 200
       );
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
+
     await checksumAI("Select a reason for the second out of office entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Fill in the notes field for the second entry", async () => {
       await page.getByTestId("notes_input").click();
       await page.getByTestId("notes_input").fill("Demo notes");
     });
+
     await checksumAI("Enable the profile redirect switch for the second entry", async () => {
       await page.getByTestId("profile-redirect-switch").click();
     });
+
     await checksumAI("Select userThree to redirect bookings to for the second entry", async () => {
       await page.getByTestId(`team_username_select_${variableStore.userToSecond.id}`).click();
     });
+
     await checksumAI("Save the second out of office entry with redirect to userThree", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.userToSecond.username}"]`),
       "The second out of office entry should be visible with redirect to userThree"
     ).toBeVisible();
+
     await checksumAI("Verify both out of office entries were created successfully", async () => {
       const ooo = await prisma.outOfOfficeEntry.findMany({
         where: {
@@ -120,8 +145,10 @@ test(
         },
         take: 2,
       });
+
       const firstEntry = ooo[0];
       const secondEntry = ooo[1];
+
       expect(firstEntry.toUserId).toBe(variableStore.userToSecond.id);
       expect(secondEntry.toUserId).toBe(variableStore.userTo.id);
     });

@@ -6,75 +6,104 @@ test(
     "Time slots are not reserved when going back via Cancel button on Event Form",
     "PRO_CANCEL_BACK_001"
   ),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Should fail as the first available time slot is 9:00",
+        shouldPass: false,
+      },
+    },
+  },
   async ({ context, page, users, variableStore }) => {
     await checksumAI("Create a pro user for testing cancel back reservation", async () => {
       variableStore.pro = await users.create();
     });
+
     await checksumAI("Navigate to the pro user's booking page", async () => {
       await page.goto(`/${variableStore.pro.username}`);
     });
+
     await checksumAI("Save the initial URL for later comparison", async () => {
       variableStore.initialUrl = page.url();
     });
+
     await checksumAI("Wait for event type links to be available", async () => {
       await page.waitForSelector('[data-testid="event-type-link"]');
     });
+
     await checksumAI("Click on the first event type to start booking", async () => {
       const eventTypeLink = page.locator('[data-testid="event-type-link"]').first();
       await eventTypeLink.click();
     });
+
     await checksumAI("Navigate to next month to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Select the first available day in the calendar", async () => {
       await page.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
     });
+
     await checksumAI("Select the first available time slot", async () => {
       await page.locator('[data-testid="time"]').nth(0).click();
     });
+
     await checksumAI("Wait for the back button to be available", async () => {
       await page.locator('[data-testid="back"]').waitFor();
     });
+
     await checksumAI("Click the back button to cancel the time slot selection", async () => {
       await page.click('[data-testid="back"]');
     });
+
     await checksumAI("Create a second page in the same context to test slot availability", async () => {
       variableStore.pageTwo = await context.newPage();
     });
+
     await checksumAI("Navigate to the initial URL in the second page", async () => {
       await variableStore.pageTwo.goto(variableStore.initialUrl);
     });
+
     await checksumAI("Wait for the second page to load the URL", async () => {
       await variableStore.pageTwo.waitForURL(variableStore.initialUrl);
     });
+
     await checksumAI("Wait for event type links to be available in the second page", async () => {
       await variableStore.pageTwo.waitForSelector('[data-testid="event-type-link"]');
     });
+
     await checksumAI("Click on the first event type in the second page", async () => {
       const eventTypeLinkTwo = variableStore.pageTwo.locator('[data-testid="event-type-link"]').first();
       await eventTypeLinkTwo.waitFor();
       await eventTypeLinkTwo.click();
     });
+
     await checksumAI("Wait for the month increment button to be available in the second page", async () => {
       await variableStore.pageTwo.locator('[data-testid="incrementMonth"]').waitFor();
     });
+
     await checksumAI("Navigate to next month in the second page", async () => {
       await variableStore.pageTwo.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Wait for available days to load in the second page", async () => {
       await variableStore.pageTwo.locator('[data-testid="day"][data-disabled="false"]').nth(0).waitFor();
     });
+
     await checksumAI("Select the first available day in the second page", async () => {
       await variableStore.pageTwo.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
     });
+
     await checksumAI("Wait for time slots to load in the second page", async () => {
       await variableStore.pageTwo.locator('[data-testid="time"]').nth(0).waitFor();
     });
+
     await checksumAI("Get the first available time slot text", async () => {
       const firstSlotAvailable = variableStore.pageTwo.locator('[data-testid="time"]').nth(0);
       variableStore.firstSlotAvailableText = await firstSlotAvailable.innerText();
     });
+
     await expect(
       variableStore.pageTwo.locator('[data-testid="time"]').nth(0),
       "The first available time slot should show 10:00 when going back"

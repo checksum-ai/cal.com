@@ -3,21 +3,31 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Pro user's page has at least 2 visible events", "PRO_EVENTS_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Should use soft assertion to pass the test as the number of visible events is more than 2",
+      },
+    },
+  },
   async ({ page, users }) => {
     let pro: any;
+
     await checksumAI("Create a pro user for testing visible events", async () => {
       pro = await users.create();
     });
+
     await checksumAI("Navigate to the pro user's booking page", async () => {
       await page.goto(`/${pro.username}`);
     });
+
     const $eventTypes = page.locator("[data-testid=event-types] > *");
     await expect
       .poll(async () => {
         const count = await $eventTypes.count();
         return count >= 5;
-      }, "The pro user should have at least 2 visible event types on their page")
+      }, "The pro user should have visible event types on their page")
       .toBeTruthy();
   }
 );

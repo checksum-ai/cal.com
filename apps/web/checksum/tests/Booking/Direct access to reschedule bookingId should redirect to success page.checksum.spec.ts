@@ -8,7 +8,14 @@ test(
     "Direct access to reschedule/{bookingId} should redirect to success page",
     "DISABLED_CANCEL_002"
   ),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Fill '[name=\"name\"]' input to submit the form",
+      },
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a user with disabled cancellation and rescheduling event type", async () => {
       variableStore.user = await users.create({
@@ -24,43 +31,55 @@ test(
         ],
       });
     });
+
     await checksumAI("Navigate to the event type booking page", async () => {
       await page.goto(`/${variableStore.user.username}/no-cancel-no-reschedule`);
     });
+
     await checksumAI("Navigate to next month to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Select the first available day in the calendar", async () => {
       await page.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
     });
+
     await checksumAI("Select the first available time slot", async () => {
       await page.locator('[data-testid="time"]').nth(0).click();
     });
+
     await checksumAI("Fill in the attendee email address", async () => {
       await page.fill('[name="email"]', "test-booker@example.com");
     });
+
     await checksumAI("Add notes for the meeting", async () => {
       await page.fill('[name="notes"]', "Test notes");
     });
+
     await checksumAI("Confirm the booking by clicking the confirm button", async () => {
       await page.click('[data-testid="confirm-book-button"]');
     });
+
     await expect(
       page.locator("[data-testid=success-page]"),
       "The booking success page should be visible after confirming the booking"
     ).toBeVisible();
+
     await checksumAI("Extract the booking ID from the URL", async () => {
       const url = new URL(page.url());
       const pathSegments = url.pathname.split("/");
       variableStore.bookingId = pathSegments[pathSegments.length - 1];
     });
+
     await checksumAI("Navigate directly to the reschedule page for the booking", async () => {
       await page.goto(`/reschedule/${variableStore.bookingId}`);
     });
+
     await expect(
       page.locator("[data-testid=success-page]"),
       "The success page should be visible when accessing reschedule page directly"
     ).toBeVisible();
+
     await expect(
       page,
       "The page should redirect to the booking page when accessing reschedule directly"

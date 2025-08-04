@@ -3,14 +3,22 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Default - No date range filter selected", "OOO_DATE_FILTER_DEFAULT_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Unrecoverable test as the date range filter component is removed from the UI",
+      shouldPass: false,
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a user", async () => {
       variableStore.user = await users.create({ name: "userOne" });
     });
+
     await checksumAI("Login as the created user", async () => {
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -19,6 +27,7 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await expect(
       page.locator('[data-testid="date-range-filter"]'),
       "The date range filter should show no filter selected by default"

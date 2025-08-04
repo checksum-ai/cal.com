@@ -6,25 +6,38 @@ test(
     "Reschedule redirects when rescheduleUid does not match current event type",
     "PRO_RESCHEDULE_002"
   ),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change:
+          "It should use soft assertion to pass the test as the URL is correct and it redirected to eventType slug",
+        shouldPass: false,
+      },
+    },
+  },
   async ({ page, users, bookings }) => {
     let pro: any;
     let eventType: any;
     let bookingFixture: any;
+
     await checksumAI("Create a pro user for testing reschedule redirect functionality", async () => {
       pro = await users.create();
     });
+
     await checksumAI("Create a booking for the pro user to test reschedule redirect", async () => {
       [eventType] = pro.eventTypes;
       bookingFixture = await bookings.create(pro.id, pro.username, eventType.id);
     });
+
     await checksumAI("Navigate to wrong event type with rescheduleUid to test redirect", async () => {
       // open the wrong eventType (rescheduleUid created for /30min event)
       await page.goto(`${pro.username}/${pro.eventTypes[1].slug}?rescheduleUid=${bookingFixture.uid}`);
     });
+
     await expect(
       page,
       "The page should redirect to the correct event type when rescheduleUid doesn't match"
-    ).toHaveURL(new RegExp(`${pro.username}/events`));
+    ).toHaveURL(new RegExp(`${pro.username}/30-minutes`));
   }
 );

@@ -3,69 +3,95 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Time slots should be reserved when selected", "PRO_RESERVATION_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Should fail as the first available time slot is 9:30",
+        shouldPass: false,
+      },
+    },
+  },
   async ({ context, page, browser, users, variableStore }) => {
     await checksumAI("Create a pro user for testing time slot reservation", async () => {
       variableStore.pro = await users.create();
     });
+
     await checksumAI("Navigate to the pro user's booking page", async () => {
       await page.goto(`/${variableStore.pro.username}`);
     });
+
     await checksumAI("Save the initial URL for later comparison", async () => {
       variableStore.initialUrl = page.url();
     });
+
     await checksumAI("Click on the first event type to start booking", async () => {
       await page.locator('[data-testid="event-type-link"]').first().click();
     });
+
     await checksumAI("Navigate to next month to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Select the first available day in the calendar", async () => {
       await page.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
     });
+
     await checksumAI("Select the first available time slot to reserve it", async () => {
       await page.locator('[data-testid="time"]').nth(0).click();
     });
+
     await checksumAI("Create a new browser context to test slot availability", async () => {
       variableStore.newContext = await browser.newContext();
     });
+
     await checksumAI("Create a new page in the browser context", async () => {
       variableStore.pageTwoInNewContext = await variableStore.newContext.newPage();
     });
+
     await checksumAI("Navigate to the initial URL in the new context", async () => {
       await variableStore.pageTwoInNewContext.goto(variableStore.initialUrl);
     });
+
     await checksumAI("Wait for the new context page to load the URL", async () => {
       await variableStore.pageTwoInNewContext.waitForURL(variableStore.initialUrl);
     });
+
     await checksumAI("Click on the first event type in the new context", async () => {
       await variableStore.pageTwoInNewContext.locator('[data-testid="event-type-link"]').first().click();
     });
+
     await checksumAI("Wait for the month increment button to be available in the new context", async () => {
       await variableStore.pageTwoInNewContext.locator('[data-testid="incrementMonth"]').waitFor();
     });
+
     await checksumAI("Navigate to next month in the new context", async () => {
       await variableStore.pageTwoInNewContext.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Wait for available days to load in the new context", async () => {
       await variableStore.pageTwoInNewContext
         .locator('[data-testid="day"][data-disabled="false"]')
         .nth(0)
         .waitFor();
     });
+
     await checksumAI("Select the first available day in the new context", async () => {
       await variableStore.pageTwoInNewContext
         .locator('[data-testid="day"][data-disabled="false"]')
         .nth(0)
         .click();
     });
+
     await checksumAI("Wait for time slots to load in the new context", async () => {
       await variableStore.pageTwoInNewContext.locator('[data-testid="time"]').nth(0).waitFor();
     });
+
     await checksumAI("Get the first available time slot text", async () => {
       const firstSlotAvailable = variableStore.pageTwoInNewContext.locator('[data-testid="time"]').nth(0);
       variableStore.firstSlotAvailableText = await firstSlotAvailable.innerText();
     });
+
     await expect(
       variableStore.pageTwoInNewContext.locator('[data-testid="time"]').nth(0),
       "The first available time slot should show 11:00 when reserved"

@@ -3,12 +3,19 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Default date range filter set to `Last 7 Days`", "OOO_DATE_FILTER_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Unrecoverable test as the default filter value is changed from 'Last 7 Days' to 'All'",
+      shouldPass: false,
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a user and log in", async () => {
       variableStore.user = await users.create({ name: "userOne" });
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -17,9 +24,10 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await expect(
       page.locator('[data-testid="date-range-filter"]'),
-      "The date range filter should be visible and set to Last 7 Days by default"
-    ).toHaveValue("Last 7 Days");
+      "The date range filter should be visible and set to All by default"
+    ).toHaveValue("All");
   }
 );

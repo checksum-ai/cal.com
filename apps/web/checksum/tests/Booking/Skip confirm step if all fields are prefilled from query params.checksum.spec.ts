@@ -3,11 +3,20 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Skip confirm step if all fields are prefilled from query params", "PREFILL_SKIP_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change:
+          "Should use '[data-testid=\"skip-confirm-book-button\"]' as it is correct locator for skip confirm button",
+      },
+    },
+  },
   async ({ page }) => {
     await checksumAI("Navigate to the booking page", async () => {
       await page.goto("/pro/30min");
     });
+
     await checksumAI("Add query parameters to prefill all form fields", async () => {
       const url = new URL(page.url());
       url.searchParams.set("name", "Test Name");
@@ -17,22 +26,28 @@ test(
       url.searchParams.set("notes", "This is an additional note");
       await page.goto(url.toString());
     });
+
     await checksumAI("Navigate to next month to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Select the first available day in the calendar", async () => {
       await page.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
     });
+
     await checksumAI("Select the first available time slot", async () => {
       await page.locator('[data-testid="time"]').nth(0).click();
     });
+
     await expect(
       page.locator('[data-testid="skip-confirm-button"]'),
       "The skip confirm button should be visible when all fields are prefilled"
     ).toBeVisible();
+
     await checksumAI("Click the skip confirm button to bypass the confirmation step", async () => {
       await page.click('[data-testid="skip-confirm-button"]');
     });
+
     await expect(
       page.locator("[data-testid=success-page]"),
       "The booking success page should be visible after skipping confirmation"

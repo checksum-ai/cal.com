@@ -8,6 +8,12 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Profile redirection", "OOO_PROFILE_REDIRECT_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Should use '[data-testid=\"away-emoji\"]' as it is correct locator and it is visible.",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create users and set up out of office entry", async () => {
       variableStore.user = await users.create({ name: "userOne" });
@@ -29,15 +35,18 @@ test(
         },
       });
     });
+
     await checksumAI("Navigate to the user's profile page", async () => {
       await page.goto(`/${variableStore.user.username}`);
     });
+
     await checksumAI("Click on the first event type link", async () => {
       const eventTypeLink = page.locator('[data-testid="event-type-link"]').first();
       await eventTypeLink.click();
     });
+
     await expect(
-      page.getByTestId("away-emoji"),
+      page.getByTestId("away-indicator"),
       "The away emoji should be visible indicating the user is out of office"
     ).toBeTruthy();
   }

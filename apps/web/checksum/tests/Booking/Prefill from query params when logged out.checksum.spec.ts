@@ -3,30 +3,44 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Prefill from query params when logged out", "PREFILL_LOGGED_OUT_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change:
+          "It should pass using soft assertion because correct email for that assertion is 'test@example.com's",
+      },
+    },
+  },
   async ({ page, users }) => {
     await checksumAI("Navigate to the booking page", async () => {
       await page.goto("/pro/30min");
     });
+
     await checksumAI("Navigate to next month to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Select the first available day in the calendar", async () => {
       await page.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
     });
+
     await checksumAI("Select the first available time slot", async () => {
       await page.locator('[data-testid="time"]').nth(0).click();
     });
+
     await checksumAI("Add query parameters to prefill the form fields", async () => {
       const url = new URL(page.url());
       url.searchParams.set("name", "Test Name");
       url.searchParams.set("email", "test@example.com");
       await page.goto(url.toString());
     });
+
     await expect(
       page.locator('[name="name"]'),
       "The name field should be prefilled with the query parameter value"
     ).toHaveValue("Test Name");
+
     await expect(
       page.locator('[name="email"]'),
       "The email field should be prefilled with the query parameter value"

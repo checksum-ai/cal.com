@@ -8,9 +8,18 @@ test(
     "Should throw error when both seatsPerTimeSlot and recurringEvent are set",
     "SEATS_RECURRENCE_001"
   ),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change:
+          "Should use soft assertion to pass the test as the error message is correct and just slightly different but means the same thing",
+      },
+    },
+  },
   async ({ page, users }) => {
     let user: any;
+
     await checksumAI("Create a user with conflicting seats and recurrence event type", async () => {
       user = await users.create({
         name: `Test-user-${randomString(4)}`,
@@ -29,31 +38,40 @@ test(
         ],
       });
     });
+
     await checksumAI("Navigate to the event type booking page", async () => {
       await page.goto(`/${user.username}/seats-with-recurrence`);
     });
+
     await checksumAI("Navigate to next month to find available time slots", async () => {
       await page.click('[data-testid="incrementMonth"]');
     });
+
     await checksumAI("Select the first available day in the calendar", async () => {
       await page.locator('[data-testid="day"][data-disabled="false"]').nth(0).click();
     });
+
     await checksumAI("Select the first available time slot", async () => {
       await page.locator('[data-testid="time"]').nth(0).click();
     });
+
     await checksumAI("Fill in the attendee name", async () => {
       await page.locator('[name="name"]').fill("Test name");
     });
+
     await checksumAI("Fill in the attendee email address", async () => {
       await page.locator('[name="email"]').fill(`${randomString(4)}@example.com`);
     });
+
     await checksumAI("Click the confirm book button to trigger the error", async () => {
       page.locator("[data-testid=confirm-book-button]").click();
     });
+
     await expect(
       page.locator("[data-testid=booking-fail]"),
       "The booking fail alert should be visible when seats and recurrence conflict"
     ).toBeVisible();
+
     await expect(
       page.locator("[data-testid=booking-fail]"),
       "The error message should contain the correct explanation about seats and recurrence conflict"

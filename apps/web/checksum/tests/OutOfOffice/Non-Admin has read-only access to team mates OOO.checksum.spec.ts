@@ -5,6 +5,13 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Non-Admin has read-only access to team mates OOO", "OOO_TEAM_NON_ADMIN_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Changed permission check from role-based to team-based, causing non-admin members to see edit/delete buttons when they shouldn't, simulating a permission logic bug.",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create team with admin and members", async () => {
       const member1Name = "member-1";
@@ -23,9 +30,11 @@ test(
       variableStore.member1User = users.get().find((user) => user.name === member1Name);
       variableStore.member2User = users.get().find((user) => user.name === member2Name);
     });
+
     await checksumAI("Login as team admin", async () => {
       await variableStore.teamAdmin.apiLogin();
     });
+
     await checksumAI("Navigate to the team out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -34,10 +43,12 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await expect(
       page.getByTestId("add_entry_ooo"),
       "Add entry button should be visible on the team out of office settings page"
     ).toBeVisible();
+
     await checksumAI("Click the add entry button to open the team out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -49,80 +60,103 @@ test(
       await reasonListRespPromise;
       await legacyListMembersRespPromise;
     });
+
     await expect(
       page.getByTestId(`ooofor_username_select_${variableStore.member1User?.id}`),
       "Member-1 selection dropdown should be visible in the out of office form"
     ).toBeVisible();
+
     await checksumAI("Select member-1 for the out of office entry", async () => {
       await page.getByTestId(`ooofor_username_select_${variableStore.member1User?.id}`).click();
     });
+
     await checksumAI("Click on the date range picker to select dates", async () => {
       await page.locator('[data-testid="date-range"]').click();
     });
+
     await expect(
       page.locator('button[name="next-month"]'),
       "Next month button should be visible in the date picker"
     ).toBeVisible();
+
     await checksumAI("Navigate to the next month in the date picker", async () => {
       await page.locator('button[name="next-month"]').click();
     });
+
     await checksumAI("Select the first day of the month", async () => {
       await page.locator('button[name="day"]:text-is("1")').nth(0).click();
     });
+
     await checksumAI("Select the third day of the month", async () => {
       await page.locator('button[name="day"]:text-is("3")').nth(0).click();
     });
+
     await expect(
       page.getByTestId("reason_select"),
       "Reason selection dropdown should be visible in the out of office form"
     ).toBeVisible();
+
     await checksumAI("Click on the reason selection dropdown", async () => {
       await page.getByTestId("reason_select").click();
     });
+
     await checksumAI("Select a reason for member-1's entry", async () => {
       await page.getByTestId("select-option-4").click();
     });
+
     await expect(
       page.getByTestId("notes_input"),
       "Notes input field should be visible in the out of office form"
     ).toBeVisible();
+
     await checksumAI("Click on the notes input field", async () => {
       await page.getByTestId("notes_input").click();
     });
+
     await checksumAI("Add notes for member-1's entry", async () => {
       await page.getByTestId("notes_input").fill("Demo notes");
     });
+
     await expect(
       page.getByTestId("profile-redirect-switch"),
       "Profile redirect switch should be visible in the out of office form"
     ).toBeVisible();
+
     await checksumAI("Enable redirect for member-1's entry", async () => {
       await page.getByTestId("profile-redirect-switch").click();
     });
+
     await expect(
       page.getByTestId(`team_username_select_${variableStore.member2User?.id}`),
       "Member-2 selection dropdown should be visible for redirect target"
     ).toBeVisible();
+
     await checksumAI("Select member-2 as redirect target", async () => {
       await page.getByTestId(`team_username_select_${variableStore.member2User?.id}`).click();
     });
+
     await expect(
       page.getByTestId("create-or-edit-entry-ooo-redirect"),
       "Save button should be visible in the out of office form"
     ).toBeVisible();
+
     await checksumAI("Save member-1's out of office entry with redirect to member-2", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.member2User?.username}"]`).nth(0),
       "Member-1's out of office entry should be visible with redirect to member-2"
     ).toBeVisible();
+
     await checksumAI("Logout from team admin account", async () => {
       await page.goto("/auth/signout");
     });
+
     await checksumAI("Login as member-1 (non-admin)", async () => {
       await variableStore.member1User?.apiLogin();
     });
+
     await checksumAI("Navigate to the team out of office settings page as member-1", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -131,18 +165,22 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.member2User?.username}"]`).nth(0),
       "Member-1 should be able to see the out of office entry with redirect to member-2"
     ).toBeVisible();
+
     await expect(
       page.getByTestId(`ooo-edit-${variableStore.member1User?.username}`),
       "Edit button should not be visible for non-admin member"
     ).not.toBeVisible();
+
     await expect(
       page.getByTestId(`ooo-delete-${variableStore.member1User?.username}`),
       "Delete button should not be visible for non-admin member"
     ).not.toBeVisible();
+
     await expect(
       page.getByTestId("add_entry_ooo"),
       "Add entry button should not be visible for non-admin member"

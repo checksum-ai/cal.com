@@ -9,17 +9,25 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("User can edit out of office entry", "OOO_EDIT_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Should use edit button selector '[data-testid=\"ooo-edit-${username}\"]'",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create users and team for the edit test", async () => {
       variableStore.user = await users.create({ name: "userOne" });
       variableStore.userTo = await users.create({ name: "userTwo" });
       variableStore.userToSecond = await users.create({ name: "userThree" });
+
       variableStore.team = await prisma.team.create({
         data: {
           name: "test-insights",
           slug: `test-insights-${Date.now()}-${randomString(5)}}`,
         },
       });
+
       await prisma.membership.createMany({
         data: [
           {
@@ -42,6 +50,7 @@ test(
           },
         ],
       });
+
       const uuid = uuidv4();
       await prisma.outOfOfficeEntry.create({
         data: {
@@ -58,8 +67,10 @@ test(
           },
         },
       });
+
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -68,31 +79,39 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.userTo.username}"]`),
       "The existing out of office entry should be visible in the table"
     ).toBeVisible();
+
     await checksumAI("Click the edit button for the existing out of office entry", async () => {
-      await page.getByTestId(`ooo-edit-${variableStore.userTo.username}`).click();
+      await page.getByTestId(`edit-ooo-${variableStore.userTo.username}`).click();
     });
+
     await checksumAI("Update the notes field with changed notes", async () => {
       await page.getByTestId("notes_input").click();
       await page.getByTestId("notes_input").fill("Changed notes");
     });
+
     await checksumAI("Select a different team member to redirect bookings to", async () => {
       await page.getByTestId(`team_username_select_${variableStore.userToSecond.id}`).click();
     });
+
     await checksumAI("Save the updated out of office entry", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.userToSecond.username}"]`),
       "The updated out of office entry should be visible in the table with redirect to userThree"
     ).toBeVisible();
+
     await expect(
       page.locator(`[data-testid="ooo-entry-note-${variableStore.userToSecond.username}"]`),
       "The updated note should be visible in the out of office entry"
     ).toBeVisible();
+
     await expect(
       page.locator(`[data-testid="ooo-entry-note-${variableStore.userToSecond.username}"]`),
       "The note should contain the changed text"

@@ -6,14 +6,23 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("User can create overriding entries", "OOO_OVERRIDING_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "End date was not selected correctly",
+      },
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a user", async () => {
       variableStore.user = await users.create({ name: "userOne" });
     });
+
     await checksumAI("Login as the created user", async () => {
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -22,6 +31,7 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await checksumAI("Click the add entry button to open the out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -29,21 +39,26 @@ test(
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
+
     await checksumAI("Click on the date range picker to select dates", async () => {
       await page.locator('[data-testid="date-range"]').click();
     });
+
     await checksumAI("Select dates for the first out of office entry (1st-5th)", async () => {
       await page.locator('button[name="next-month"]').click();
       await page.locator('button[name="day"]:text-is("1")').nth(0).click();
       await page.locator('button[name="day"]:text-is("5")').nth(0).click();
     });
+
     await checksumAI("Select a reason for the first entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Save the first out of office entry", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await checksumAI("Click the add entry button to create a second out of office entry", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -51,20 +66,25 @@ test(
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
+
     await checksumAI("Click on the date range picker to select dates for the second entry", async () => {
       await page.locator('[data-testid="date-range"]').click();
     });
+
     await checksumAI("Select overlapping dates for the second out of office entry (3rd-7th)", async () => {
       await page.locator('button[name="day"]:text-is("3")').nth(0).click();
       await page.locator('button[name="day"]:text-is("7")').nth(0).click();
     });
+
     await checksumAI("Select a reason for the second entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Save the overriding out of office entry", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await checksumAI("Verify the overriding out of office entry was created successfully", async () => {
       const ooo = await prisma.outOfOfficeEntry.findMany({
         where: {
@@ -79,12 +99,15 @@ test(
         },
         take: 2,
       });
+
       const firstEntry = ooo[1];
       const secondEntry = ooo[0];
+
       const firstEntryFromDate = dayjs(firstEntry.start);
       const firstEntryToDate = dayjs(firstEntry.end);
       const secondEntryFromDate = dayjs(secondEntry.start);
       const secondEntryToDate = dayjs(secondEntry.end);
+
       expect(firstEntryFromDate.format("DD")).toBe("01");
       expect(firstEntryToDate.format("DD")).toBe("05");
       expect(secondEntryFromDate.format("DD")).toBe("03");

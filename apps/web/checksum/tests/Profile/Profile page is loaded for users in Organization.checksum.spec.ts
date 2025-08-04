@@ -3,7 +3,14 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Profile page is loaded for users in Organization", "VFrFP"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: {
+        change: "Should use soft assertion to pass the test as the profile upload avatar is visible",
+      },
+    },
+  },
   async ({ page, users, variableStore }) => {
     const teamMatesObj = [{ name: "teammate-1" }, { name: "teammate-2" }];
     const owner = await users.create(undefined, {
@@ -12,10 +19,16 @@ test(
       hasSubteam: true,
       teammates: teamMatesObj,
     });
+
     await checksumAI("Login with API", () => owner.apiLogin());
+
     await checksumAI("Navigate to profile settings page", () =>
       page.goto("/settings/my-account/profile", { waitUntil: "load" })
     );
-    await expect(page.locator("img"), "Expect the profile upload avatar to be visible").toBeHidden();
+
+    await expect(
+      page.locator('img[alt="My profile avatar"]'),
+      "Expect the profile upload avatar to be visible"
+    ).toBeVisible();
   }
 );

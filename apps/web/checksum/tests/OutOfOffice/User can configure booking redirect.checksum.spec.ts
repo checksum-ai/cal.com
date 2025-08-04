@@ -6,16 +6,24 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("User can configure booking redirect", "OOO_REDIRECT_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Should select team member to redirect bookings to",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create users and team for the redirect test", async () => {
       variableStore.user = await users.create({ name: "userOne" });
       variableStore.userTo = await users.create({ name: "userTwo" });
+
       variableStore.team = await prisma.team.create({
         data: {
           name: "test-insights",
           slug: `test-insights-${Date.now()}-${randomString(5)}}`,
         },
       });
+
       await prisma.membership.createMany({
         data: [
           {
@@ -32,8 +40,10 @@ test(
           },
         ],
       });
+
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -42,6 +52,7 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await checksumAI("Click the add entry button to open the out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -49,23 +60,25 @@ test(
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
+
     await checksumAI("Select a reason for the out of office entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Fill in the notes field with demo notes", async () => {
       await page.getByTestId("notes_input").click();
       await page.getByTestId("notes_input").fill("Demo notes");
     });
+
     await checksumAI("Enable the profile redirect switch", async () => {
       await page.getByTestId("profile-redirect-switch").click();
     });
-    await checksumAI("Select a team member to redirect bookings to", async () => {
-      await page.getByTestId(`team_username_select_${variableStore.userTo.id}`).click();
-    });
+
     await checksumAI("Save the out of office entry with redirect", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator(`[data-testid="table-redirect-${variableStore.userTo.username}"]`),
       "The out of office entry should be visible in the table with redirect to userTwo"

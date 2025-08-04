@@ -3,11 +3,19 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("User can create out of office entry", "OOO_CREATE_001"),
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description:
+        "Should continue with the test as field is removed, but it is not crucial to the flow of the test",
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a user and log in", async () => {
       variableStore.user = await users.create({ name: "userOne" });
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -16,6 +24,7 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await checksumAI("Click the add entry button to open the out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -23,17 +32,25 @@ test(
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
+
     await checksumAI("Select a reason for the out of office entry", async () => {
       await page.getByTestId("reason_select").click();
       await page.getByTestId("select-option-4").click();
     });
+
     await checksumAI("Fill in the notes field with demo notes", async () => {
       await page.getByTestId("notes_input").click();
       await page.getByTestId("notes_input").fill("Demo notes");
     });
+
+    await checksumAI("Fill in the additional info field", async () => {
+      await page.getByTestId("additional_info_input").fill("Optional additional info");
+    });
+
     await checksumAI("Save the out of office entry", async () => {
       await page.getByTestId("create-or-edit-entry-ooo-redirect").click();
     });
+
     await expect(
       page.locator('[data-testid="table-redirect-n-a"]'),
       "The out of office entry should be visible in the table with no redirect"

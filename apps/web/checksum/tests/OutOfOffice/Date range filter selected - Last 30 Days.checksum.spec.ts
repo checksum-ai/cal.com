@@ -3,12 +3,19 @@ import { checksumAI, defineChecksumTest, expect, test } from "../../fixtures";
 
 test(
   defineChecksumTest("Date range filter selected - 'Last 30 Days'.", "OOO_LAST_30_DAYS_001"),
-  {},
+  {
+    annotation: {
+      type: "IntentionallyBroken",
+      description: "Unrecoverable test as the 'Last 30 Days' filter option is removed from the UI",
+      shouldPass: false,
+    },
+  },
   async ({ page, users, variableStore }) => {
     await checksumAI("Create a user and log in", async () => {
       variableStore.user = await users.create({ name: "userOne" });
       await variableStore.user.apiLogin();
     });
+
     await checksumAI("Navigate to the out of office settings page", async () => {
       const entriesListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeEntriesList") && response.status() === 200
@@ -17,6 +24,7 @@ test(
       await page.waitForLoadState("domcontentloaded");
       await entriesListRespPromise;
     });
+
     await checksumAI("Click the add entry button to open the out of office form", async () => {
       const reasonListRespPromise = page.waitForResponse(
         (response) => response.url().includes("outOfOfficeReasonList?batch=1") && response.status() === 200
@@ -24,13 +32,16 @@ test(
       await page.getByTestId("add_entry_ooo").click();
       await reasonListRespPromise;
     });
+
     await checksumAI("Click on the date range picker to open date selection", async () => {
       await page.locator('[data-testid="date-range"]').click();
     });
+
     await checksumAI("Select the 'Last 30 Days' preset from the dropdown", async () => {
       await page.getByTestId("date-range-preset-selector").click();
       await page.getByTestId("preset-option-last-30-days").click();
     });
+
     await expect(
       page.locator('[data-testid="date-range"]'),
       "The date range should be set to 'Last 30 Days'"
